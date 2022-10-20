@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <form method="post" action="/addStudent">  
+        <div class="row">     
+            <div class="col-md-6">       
+                 <div class="form-group">           
+                    <label for="studentNo">Student Id:</label>       
+                    <input class="form-control" id="studentId" name="studentId" type="text" />      
+                </div>      
+            </div>     
+            <div class="col-md-6">        
+                <div class="form-group">         
+                    <label for="name">Student Name:</label>    
+                    <input class="form-control" id="name" name="name" type="text"  />         
+                </div>      
+            </div>   
+        </div>  
+            <div class="col-md-6">    
+                <div class="form-group">     
+                    <label for="program">Program:</label>   
+                    <select class="form-control" name="program" id="program">                
+                    <option value="1">BSD</option>               
+                    <option value="2">CPD</option>           
+                    <option value="3">DSA</option>       
+                </select>      
+            </div>   
+        </div>   
+        <input type="submit" class="btn btn-primary pull-right" value="Add Student" /><br>
+    </form>
+</body>
+</html>
