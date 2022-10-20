@@ -2,6 +2,8 @@ const file = require('fs');
 
 var students = [];
 var high = [];
+var cpa = [];
+let j = 0;
 
 exports.prep = () => {
     return new Promise ((resolve, reject) => {
@@ -24,7 +26,13 @@ exports.cpa = () => {
             reject('no results returned');
         }
         else {
-            resolve(students);
+            for (let i = 0; i < students.length; i++){
+                if (students[i].program == 'CPA'){
+                    cpa[j] = students[i];
+                    j++;
+                }
+            }
+            resolve(cpa);
         }
     })
 };
@@ -43,5 +51,27 @@ exports.highGPA = () => {
             }
         }
         resolve(high);
+    })
+};
+
+exports.allStudents = () => {
+    return new Promise ((resolve,reject) => {
+        if (students.length == 0) {
+            reject('no results returned');
+        }
+        else {
+            resolve(students);
+        }
+    })
+};
+
+exports.getStudent = () => {
+    return new Promise ((resolve,reject) => {
+        if (students.length == 0) {
+            reject('no results returned');
+        }
+        else {
+            resolve(students);
+        }
     })
 };
