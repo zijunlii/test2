@@ -17,7 +17,6 @@ var express = require("express");
 var app = express();
 
 var path = require("path"); 
-const { allStudents } = require("./data_prep");
 
 var HTTP_PORT = process.env.PORT || 8080; 
 
@@ -29,6 +28,14 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname + "/home.html"));
 });
 
+app.get("/BSD", (req,res)=>{
+    dataprep.bsd().then((data)=>{
+        res.json(data);
+    }).catch((reason)=>{
+        res.json({message:reason});
+    });
+});
+
 app.get("/CPA", (req, res) => {
     dataprep.cpa().then((data) => {
         res.json({data});
@@ -37,12 +44,15 @@ app.get("/CPA", (req, res) => {
     })
 });
 
-app.get("/highGPA", (req, res) => {
-    dataprep.highGPA().then((data) => {
-        res.json({data});
-    }).catch((err) => {
-        res.json({message: err});
-    })
+app.get("/highGPA", (req, res)=>{
+    dataprep.highGPA().then((data)=>{
+        let resText = `<h2> Highest GPA: </h2>
+        <p> Student ID: ${data.studId} </p>
+        <p> Name:  ${data.name} </p>
+        <p> Program: ${data.program} </p>
+        <p> GPA: ${data.gpa} </p> `;
+        res.send(resText);
+    });
 });
 
 app.get("/allStudents", (req, res) => {
@@ -57,22 +67,43 @@ app.get('/addStudent', (req, res) => {
     res.sendFile(path.join(__dirname + "/test3_views/addStudent.html"));
 });
 
-app.post('/addStudent', (req, res) => {
-    const {fullName, studentId, program}  = req.body;
-    res.send({fullName, studentId,program});
+app.post("/addStudent", (req, res)=>{
+    dataprep.addStudent(req.body).then(()=>{
+        var data = req.body;
+        var txt =  ` <h2 style="color:red;"> The New Student Information  </h2>
+        <p> Student id: ${data.studId}</p>
+         <p> Student name: ${data.name} </p>
+        <p> Program: ${data.program} </p>
+        <p> GPA: ${data.gpa} </p>
+        <a href="/allStudents"> All Students </a> <br>
+        <a href="/"> Go Home </a>
+        `;
+        res.send(txt);
+        //res.redirect("/allStudents");
+
+    }).catch((reason)=>res.json({message:reason}));
 });
 
-app.get("/getStudent", (req, res) => {
-    dataprep.getStudent().then((data) => {
-        res.json({data});
-    }).catch((err) => {
-        res.json({message: err});
-    })
+app.get("/student/:studId",(req, res)=>{
+    dataprep.getStudent(req.params.studId).then((data)=>{
+        var txt = `
+        <h2 style="color:red;"> This Student Information  </h2>
+        <p> Student id: ${data.studId}</p>
+        <p> Student name: ${data.name} </p>
+        <p> Program: ${data.program} </p>
+        <p> GPA: ${data.gpa} </p>
+        <a href="/allStudents"> Show All Students </a> <br>
+        <a href="/"> Go Home </a>
+        `;
+        res.send(txt);
+       // res.json(data);
+       // {"studId":3,"name":"name3","program":"BSD","gpa":3.3}
+    }).catch((reason)=>res.json({message:reason}));
 });
 
 app.use((req, res) => {
     let resText = "<h2> SORRY 404 PAGE NOT FOUND </h2> <br>";
-    resText += "<a href = './'> Back to Home </a> <br>";
+    resText += "<a href = '/'> Back to Home </a> <br>";
     res.send(resText);
 });
 
