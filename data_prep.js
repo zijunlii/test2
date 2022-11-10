@@ -1,21 +1,15 @@
-var file = require('fs');
-
-var students = [];
-var cpa = [];
-let j = 0;
-
-exports.prep = () => {
-    return new Promise ((resolve, reject) => {
-        file.readFile('./students.json', (err,data) => {
-            if (err) {
-                reject ('Failure to read file students.json!');
-            }
-            else {
-                students = JSON.parse(data);
-            }
-        });
-        resolve();
-    })
+var fs = require("fs");
+var students=[];
+exports.prep = ()=>{
+   // console.log("Testing");
+   return new Promise((resolve, reject)=>{
+        fs.readFile("./students.json", (err, data)=>{
+            if (err) {reject("unable to read file.");}
+            students = JSON.parse(data);
+           // console.log(students);
+            resolve("File read success.");
+        }); 
+   });
 };
 
 exports.bsd = ()=>{
@@ -25,23 +19,13 @@ exports.bsd = ()=>{
     });
 }
 
-exports.cpa = () => {
-    return new Promise ((resolve,reject) => {
-        if (students.length == 0) {
-            reject('no results returned');
-        }
-        else {
-            for (let i = 0; i < students.length; i++){
-                if (students[i].program == 'CPA'){
-                    cpa[j] = students[i];
-                    j++;
-                }
-            }
-            resolve(cpa);
-        }
-    })
-};
 
+exports.cpa = ()=>{
+    return new Promise((resolve, reject)=>{
+       let results = students.filter(student => student.program == "CPA");
+       (results.length == 0)? reject("No CPA students."):resolve(results);
+    });
+}
 exports.highGPA = ()=>{
     return new Promise((resolve, reject)=>{
         let high = 0;
@@ -76,18 +60,16 @@ exports.lowGPA = ()=>{
     }); 
 };
 
-exports.allStudents = () => {
-    return new Promise ((resolve,reject) => {
-        if (students.length == 0) {
-            reject('no results returned');
-        }
-        else {
+exports.allStudents =()=>{
+    return new Promise((resolve, reject)=>{
+        if (students.length>0)
+        {
             resolve(students);
-        }
+        } else reject("No students.");
     })
-};
+}
 
-exports.addStudent = (stud)=>{
+exports.addStudent= (stud)=>{
     return new Promise((resolve, reject)=>{
         stud.studId = students.length+1;
         students.push(stud);
