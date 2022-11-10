@@ -14,6 +14,7 @@ var express = require("express");
 var app = express();
 var data_prep = require("./data_prep.js");
 var path = require("path");
+const exphbs = require('express-handlebars');
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -24,27 +25,18 @@ function onHttpStart()
     console.log("Express http server listening on " + HTTP_PORT);
 }
 
-app.get("/",(req,res)=>{
-    let resText = "<h2>Declaration (text size in heading 2): </h2> ";
-    resText += "<p> The rest text is displayed in paragraph as shown in screenshot. </p>";
-    resText += " <p> I acknowledge the College’s academic integrity policy – and my own integrity ";
-    resText += "– remain in effect whether my work is done remotely or onsite.";
-    resText += " Any test or assignment is an act of trust between me and my instructor, ";
-    resText += " and especially with my classmates… even when no one is watching.";
-    resText += " I declare I will not break that trust. </p>";
-    resText += "<p>Name: <mark> <b> Zijun Li </b> </mark> </p>";
-    resText += "<p>Student Number: <mark><b> 170055214 </b> </mark> </p>";
-    
-    resText += `<ul>
-                <li> <a href = "/CPA"> CPA Students </a></li>
-                <li> <a href = "/highGPA"> Highest GPA </a></li>
-                <li> <a href = "/allStudents"> All Students </a></li>
-                <li> <a href = "/addStudent"> Add A New Student </a></li>
-                <li> Note: Locate specific student by student Id, e.g., <br>
-                 http://localhost:8080/student/3 </li>
-                `
+app.engine('.hbs', exphbs.engine({ 
+    extname: ".hbs"
+}));
 
-    res.send(resText);
+app.set('view engine', '.hbs');
+
+app.get('/', (req, res) => {
+    res.render('home');
+});
+
+app.get('/home', (req, res) => {
+    res.render('home');
 });
 
 app.get("/BSD", (req,res)=>{
@@ -56,10 +48,10 @@ app.get("/BSD", (req,res)=>{
 });
 
 app.get("/CPA", (req,res)=>{
-    data_prep.cpa().then((data)=>{
-        res.json(data);
-    }).catch((reason)=>{
-        res.json({message:reason});
+    data_prep.cpa(req.query.status).then((data)=>{
+        res.render("students",{students: data});
+    }).catch((err)=>{
+        res.render({message: "no results"});
     });
 });
 
@@ -75,9 +67,11 @@ app.get("/highGPA", (req, res)=>{
 });
 
 app.get("/allStudents", (req, res)=>{
-    data_prep.allStudents().then((data)=>{
-        res.json(data);
-    }).catch((reason)=>res.json({message:reason}));
+    data_prep.allStudents(req.query.status).then((data)=>{
+        res.render("students",{students: data});
+    }).catch((err)=>{
+        res.render({message: "no results"});
+    });
 });
 
 app.get("/addStudent", (req, res)=>{
@@ -86,36 +80,16 @@ app.get("/addStudent", (req, res)=>{
 
 app.post("/addStudent", (req, res)=>{
     data_prep.addStudent(req.body).then(()=>{
-        var data = req.body;
-        var txt =  ` <h2 style="color:red;"> The New Student Information  </h2>
-        <p> Student id: ${data.studId}</p>
-         <p> Student name: ${data.name} </p>
-        <p> Program: ${data.program} </p>
-        <p> GPA: ${data.gpa} </p>
-        <a href="/allStudents"> All Students </a> <br>
-        <a href="/"> Go Home </a>
-        `;
-        res.send(txt);
-        //res.redirect("/allStudents");
-
-    }).catch((reason)=>res.json({message:reason}));
+        res.redirect('allStudents');
+    })
 });
 
 app.get("/student/:studId",(req, res)=>{
     data_prep.getStudent(req.params.studId).then((data)=>{
-        var txt = `
-        <h2 style="color:red;"> This Student Information  </h2>
-        <p> Student id: ${data.studId}</p>
-        <p> Student name: ${data.name} </p>
-        <p> Program: ${data.program} </p>
-        <p> GPA: ${data.gpa} </p>
-        <a href="/allStudents"> Show All Students </a> <br>
-        <a href="/"> Go Home </a>
-        `;
-        res.send(txt);
-       // res.json(data);
-       // {"studId":3,"name":"name3","program":"BSD","gpa":3.3}
-    }).catch((reason)=>res.json({message:reason}));
+        res.render("student",{students: data});
+    }).catch((err)=>{
+        res.render("student",{message: "no results"});
+    })
 });
 
 app.get("*", (req, res)=>{

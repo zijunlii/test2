@@ -73,7 +73,7 @@ exports.addStudent= (stud)=>{
     return new Promise((resolve, reject)=>{
         stud.studId = students.length+1;
         students.push(stud);
-        resolve();
+        resolve(students);
     });
 }
 
