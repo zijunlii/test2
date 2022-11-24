@@ -1,11 +1,11 @@
 /*************************************************************************
-* WEB322– Test 4
+* WEB322– Test 5
 * I declare that this assignment is my own work in accordance with Seneca Academic
 Policy. No part * of this assignment has been copied manually or electronically from any
 other source
 * (including 3rd party web sites) or distributed to other students.
 *
-* Name: Zijun Li    Student ID: 170055214   Date: 11/10/2022
+* Name: Zijun Li    Student ID: 170055214   Date: 11/24/2022
 *
 * Your app’s URL (from Cyclic) : App URL: https://vast-jade-goshawk-veil.cyclic.app
 *
@@ -48,7 +48,7 @@ app.get("/BSD", (req,res)=>{
 });
 
 app.get("/CPA", (req,res)=>{
-    data_prep.cpa(req.query.status).then((data)=>{
+    data_prep.cpa().then((data)=>{
         res.render("students",{students: data});
     }).catch((err)=>{
         res.render({message: "no results"});
@@ -67,11 +67,11 @@ app.get("/highGPA", (req, res)=>{
 });
 
 app.get("/allStudents", (req, res)=>{
-    data_prep.allStudents(req.query.status).then((data)=>{
+    data_prep.allStudents().then((data)=>{
         res.render("students",{students: data});
     }).catch((err)=>{
         res.render({message: "no results"});
-    });
+    })
 });
 
 app.get("/addStudent", (req, res)=>{
@@ -80,7 +80,7 @@ app.get("/addStudent", (req, res)=>{
 
 app.post("/addStudent", (req, res)=>{
     data_prep.addStudent(req.body).then(()=>{
-        res.redirect('allStudents');
+        res.redirect('/allStudents');
     })
 });
 
